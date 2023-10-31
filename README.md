@@ -86,4 +86,5 @@ https://www.youtube.com/watch?v=n_FDGMr4MxE&feature=mweb_3_dot_11268432&itc_camp
 
 
 ## Paper
-U-Net : https://arxiv.org/pdf/1505.04597.pdf
+U-Net : https://arxiv.org/pdf/1505.04597.pdf  
+Elastic Deformations for Data Augmentation in Breast Cancer Mass Detection : https://web.fe.up.pt/~jsc/publications/conferences/2018EMecaBHI.pdf
