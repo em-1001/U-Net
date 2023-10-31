@@ -5,7 +5,7 @@
 
 <p align="center"><img src="https://github.com/em-1001/AI/assets/80628552/1818718b-3ea6-4aa9-9c09-ae01d04a1ee9" height="25%" width="25%"> 　　　　　　　　<img src="https://github.com/em-1001/AI/assets/80628552/65d6c4a4-219d-438b-9adb-0e835ba23d63" height="25%" width="25%"></p>
 
-왼쪽은 일반적으로 사용하는 Down-sampling 목적의 Strided Convolution연산으로 너비와 높이가 감소하게 된다. 반면 오른쪽과 같이 Up-sampling 목적으로는 Transposed Convolution연산이 쓰이며 Up-sampling할 input 주위에 공백을 추가하여 Up-sampling을 하고 여기서 공백은 padding이 아니라 stride에 따라 결정된다. (별다른 조건이 없으면 kernelsize -1 만큼 추가한다.) 또한 만약 Transposed Convolution시 stride가 있다면 오른쪽 이미지와 같이 input의 원소 사이에 공백을 추가한다. 
+왼쪽은 일반적으로 사용하는 Down-sampling 목적의 Strided Convolution연산으로 너비와 높이가 감소하게 된다. 반면 오른쪽과 같이 Up-sampling 목적으로는 Transposed Convolution연산이 쓰이며 Up-sampling할 input 주위에 공백을 추가하여 Up-sampling을 하고 여기서 공백은 padding이 아니라 stride에 따라 결정된다. (별다른 조건이 없으면 kernelsize -1 만큼 추가한다.) 또한 만약 Transposed Convolution시 stride가 있다면 오른쪽 이미지와 같이 input의 원소 사이에 공백을 추가한다. 결과적으로 이러한 과정을 반복해서 32x32까지 크기를 줄여준다. 
 
 Transposed Convolutio의 output size는 input size를 $I$, stride를 $S$, kernel size를 $K$, padding size를 $P$라 했을 때 다음과 같이 구해진다. 
 
@@ -13,7 +13,41 @@ $$O = (I-1) \times S + K - 2P$$
 
 
 ## Architecture
-<p align="center"><img src="https://github.com/em-1001/U-Net/assets/80628552/ae0b24aa-c7a2-436f-84ab-2498c21fb994" height="60%" width="60%"></p>
+<p align="center"><img src="https://github.com/em-1001/U-Net/assets/80628552/ae0b24aa-c7a2-436f-84ab-2498c21fb994" height="65%" width="65%"></p>
+
+#### Contracting path
+전체적인 architecture는 위와 같이 생겼다. Contracting path부터 살펴보면 572x572와 같은 수는 해상도를 의미하며 입력이 흑백이면 채널 size는 위 architecture의 input처럼 1이 된다. 이러한 input에 kernel size가 64인 Convolution Layer를 사용해서 570x570x64 출력 tensor를 얻는다. 이러한 Convolution Layer을 한 번 더 사용해서 568x568로 줄여주었고, 다음으로 max pooling을 이용해서 너비와 높이를 절반 씩으로 줄여주었다. 다음으로 다시 Convolution Layer를 사용하여 channel size는 증가시키고, 너비와 높이는 줄여준다.
+conv연산에서는 일반적인 classification 연산처럼 Conv -> ReLU -> Max Pooling의 연산을 거친다. 
+
+#### Expanding path
+Expanding path에서는 반대로 up-conv를 사용해서 해상도를 증가시키고 channel size는 줄여야 하므로 Convolution Layer에서의 kernel size를 줄여준다. 이러한 과정을 반복해서 최종적으로 388x388x2로 class의 수가 2개인 output이 만들어진다. Expanding path에서 중요한 점은 Contracting path에서 사용된 feature map을 그대로 전달해서 Expanding path에서 사용할 수 있도록 한다는 것이다. Expanding path에 보이는 하얀색 tensor가 해당 부분이고 Contracting path에서 추출한 feature map을 사용할 수 있기 때문에 보다 성능이 좋아지게 된다. 
+
+추가적으로 U-Net은 Segmentation을 위한 네크워크이기 때문에 별도의 FC Layer가 필요하지 않고, Fully Convolutional Network(FCN)으로 구성된다. 또한 Contracting path의 경우 일반적인 classification model과 동일하기 때문에 이 부분은 사전에 잘 학습되어 있는 classification model을 Encoder 형태로 사용하는 경우가 많다. 
+
+
+## Overlap-tile
+<p align="center"><img src="https://github.com/em-1001/U-Net/assets/80628552/50229385-c271-4e28-ac01-6ae8487f4df3" height="60%" width="60%"></p>
+
+U-Net은 Overlap-tile 전략을 사용하는데, 이는 U-Net 구조의 특성상 출력 이미지의 해상도가 입력 이미지보다 작기 때문에 의도적으로 입력을 더욱 크게 넣는 것이다. 예를 들어 위 사진에서 노란색 영역만큼 Segmentation결과가 필요하다고 하면 그보다 더 큰 파란색 영역을 입력으로 넣는다. 이렇게 하게 되면 파란색 영역 tile과 그 오른쪽 tile이 서로 겹칠 수 밖에 없게 되고, 이미지의 왼쪽 위 부분 같은 경우(위 사진에서는 노란색 부분 왼쪽 위) 입력 이미지에는 존재하지 않는 부분이므로 미러링(mirroring)을 통해 이미지 패치를 만들어주어 네트워크에 입력으로 넣게 된다. 
+
+## Objective Function 
+U-Net은 Segmentation을 위한 네트워크이므로 다음과 같이 필셀 단위(pixel-wise) softmax를 사용한다. 
+
+$$P_k(x) = \frac{exp(a_k(x))}{\displaystyle\sum_{k^{'}=1}^{K} exp(a_{k^{'}}(x))}$$
+
+$x \in \Omega$ : pixel position ($\Omega \subset Z^2$)  
+$k$ : $k$ th feature channel(class)  
+$a_k(x)$ : activation value of the $x$ position of the $k$ th channel
+
+$a$를 네트워크의 출력(activation)이라고 보면 일반적인 softmax와 같은 형태이다. 다만 각각의 pixel마다 확률 값을 예측해야 하므로 모든 각 pixel $x$ 마다 확률을 구하는 형태로 softmax가 쓰인다.  
+
+$$E = \sum_{x \in \Omega} w(x) \log \left(p_{l(X)}(x) \right)$$
+
+$l(x)$ : true label of image $x$
+
+학습을 위한 Loss로는 Cross Entropy를 사용한다. $l(x)$가 이미지 $x$의 true label이므로 $p_{l(X)}$ 는 true label에 대한 확률 값이다. 여기에 $\log$를 씌워서 그 확률 값이 증가할 수 있도록 학습을 진행하고, 앞에 $w(x)$ 는 추가적인 가중치 함수로 이는 각각의 pixel마다 가중치를 부여하여 더 학습이 잘 수행되거나 혹은 덜 수행되도록 조정한다. 
+
+
 
 
 
