@@ -13,7 +13,7 @@ $$O = (I-1) \times S + K - 2P$$
 
 
 ## Architecture
-<p align="center"><img src="https://github.com/em-1001/U-Net/assets/80628552/ae0b24aa-c7a2-436f-84ab-2498c21fb994" height="65%" width="65%"></p>
+<p align="center"><img src="https://github.com/em-1001/U-Net/assets/80628552/ae0b24aa-c7a2-436f-84ab-2498c21fb994" height="70%" width="70%"></p>
 
 #### Contracting path
 전체적인 architecture는 위와 같이 생겼다. Contracting path부터 살펴보면 572x572와 같은 수는 해상도를 의미하며 입력이 흑백이면 채널 size는 위 architecture의 input처럼 1이 된다. 이러한 input에 kernel size가 64인 Convolution Layer를 사용해서 570x570x64 출력 tensor를 얻는다. 이러한 Convolution Layer을 한 번 더 사용해서 568x568로 줄여주었고, 다음으로 max pooling을 이용해서 너비와 높이를 절반 씩으로 줄여주었다. 다음으로 다시 Convolution Layer를 사용하여 channel size는 증가시키고, 너비와 높이는 줄여준다.
