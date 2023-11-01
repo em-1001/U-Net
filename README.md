@@ -17,7 +17,7 @@ $$O = (I-1) \times S + K - 2P$$
 
 #### Contracting path
 전체적인 architecture는 위와 같이 생겼다. Contracting path부터 살펴보면 572x572와 같은 수는 해상도를 의미하며 입력이 흑백이면 채널 size는 위 architecture의 input처럼 1이 된다. 이러한 input에 kernel size가 64인 Convolution Layer를 사용해서 570x570x64 출력 tensor를 얻는다. 이러한 Convolution Layer을 한 번 더 사용해서 568x568로 줄여주었고, 다음으로 max pooling을 이용해서 너비와 높이를 절반 씩으로 줄여주었다. 다음으로 다시 Convolution Layer를 사용하여 channel size는 증가시키고, 너비와 높이는 줄여준다.
-conv연산에서는 일반적인 classification 연산처럼 Conv -> ReLU -> Max Pooling의 연산을 거친다. 
+conv연산에서는 일반적인 classification 연산처럼 Conv $\to$ ReLU $\to$ Max Pooling의 연산을 거친다. 
 
 #### Expanding path
 Expanding path에서는 반대로 up-conv를 사용해서 해상도를 증가시키고 channel size는 줄여야 하므로 Convolution Layer에서의 kernel size를 줄여준다. 이러한 과정을 반복해서 최종적으로 388x388x2로 class의 수가 2개인 output이 만들어진다. Expanding path에서 중요한 점은 Contracting path에서 사용된 feature map을 그대로 전달해서 Expanding path에서 사용할 수 있도록 한다는 것이다. Expanding path에 보이는 하얀색 tensor가 해당 부분이고 Contracting path에서 추출한 feature map을 사용할 수 있기 때문에 보다 성능이 좋아지게 된다. 
