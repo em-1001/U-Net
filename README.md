@@ -47,7 +47,7 @@ $l(x)$ : true label of image $x$
 
 학습을 위한 Loss로는 Cross Entropy를 사용한다. $l(x)$가 이미지 $x$의 true label이므로 $p_{l(X)}$ 는 true label에 대한 확률 값이다. 여기에 $\log$를 씌워서 그 확률 값이 증가할 수 있도록 학습을 진행하고, 앞에 $w(x)$ 는 추가적인 가중치 함수로 이는 각각의 pixel마다 가중치를 부여하여 더 학습이 잘 수행되거나 혹은 덜 수행되도록 조정한다. 
 
-$$w(x) = w_c(x) + w_0 \cdot e^{\left(-\frac{(d_1(x)+d_2(x))^2}{2\sigma^2} \right)}$$
+$$w(x) = w_c(x) + w_0 \cdot \exp\left(-\frac{(d_1(x)+d_2(x))^2}{2\sigma^2} \right)$$
 
 $w_c$ : $\Omega \to R$ : The weight map to balance the class frequencies.    
 $d_1$ : $\Omega \to R$ : The distance to the border of the nearest cell.    
