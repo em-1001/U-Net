@@ -20,7 +20,7 @@ $$O = (I-1) \times S + K - 2P$$
 conv연산에서는 일반적인 classification 연산처럼 Conv $\to$ ReLU $\to$ Max Pooling의 연산을 거친다. 
 
 #### Expanding path
-Expanding path에서는 반대로 up-conv를 사용해서 해상도를 증가시키고 channel size는 줄여야 하므로 Convolution Layer에서의 kernel size를 줄여준다. 이러한 과정을 반복해서 최종적으로 388x388x2로 class의 수가 2개인 output이 만들어진다. Expanding path에서 중요한 점은 Contracting path에서 사용된 feature map을 그대로 전달해서 Expanding path에서 사용할 수 있도록 한다는 것이다. Expanding path에 보이는 하얀색 tensor가 해당 부분이고 Contracting path에서 추출한 feature map을 사용할 수 있기 때문에 보다 성능이 좋아지게 된다. 
+Expanding path에서는 반대로 up-conv를 사용해서 해상도를 증가시키고 channel size는 줄여야 하므로 Convolution Layer에서의 kernel size를 줄여준다. 이러한 과정을 반복해서 최종적으로 388x388x2로 class의 수가 2개인 output이 만들어진다. Expanding path에서 중요한 점은 Contracting path에서 사용된 feature map을 그대로 전달해서 Expanding path에서 사용할 수 있도록 한다는 것이다. 이때 추출한 feature map의 size가 Expanding path에서의 size와 차이가 있을 수 있으므로 어느정도 cropping을 해서 붙여준다.  Expanding path에 보이는 하얀색 tensor가 해당 부분이고 Contracting path에서 추출한 feature map을 사용할 수 있기 때문에 보다 성능이 좋아지게 된다. 
 
 추가적으로 U-Net은 Segmentation을 위한 네크워크이기 때문에 별도의 FC Layer가 필요하지 않고, Fully Convolutional Network(FCN)으로 구성된다. 또한 Contracting path의 경우 일반적인 classification model과 동일하기 때문에 이 부분은 사전에 잘 학습되어 있는 classification model을 Encoder 형태로 사용하는 경우가 많다. 
 
