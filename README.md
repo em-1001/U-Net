@@ -79,15 +79,6 @@ $w(x)$는 위와 같이 계산되며 세포(cell)을 명확하게 구분하기 �
 위 두 개의 데이터 세트로 실험을 진행해본 결과 위 사진 처럼 segmentation을 잘 수행하는 것을 확인할 수 있다. 
 **b** 사진의 청록색은 모델이 예측한 부분이고, 노란색 테두리가 ground truth인데 결과가 거의 유사한 것을 확인할 수 있다. **d** 사진도 마찬가지로 모델의 예측 결과가 ground truth가 유사함을 확인할 수 있다. 
 
-## U-Net From Scratch Result
-**Epoch : 1, Batch : 1**
-<p align="center"><img src="https://github.com/em-1001/U-Net/assets/80628552/449fe6c9-5102-4012-b701-8bb192fbf421" height="75%" width="75%"></p>
-
-<p align="center"><img src="https://github.com/em-1001/U-Net/assets/80628552/4719563d-b85f-4b91-9f93-e910fe0e901e" height="75%" width="75%"></p>
-
-https://sd118687.tistory.com/11?category=549654  
-https://github.com/heohyunjun/Deep-Learning/blob/4e1c0962f46cc0bb6caa386568c950d5b402e7c7/modeling_with_paper/Unet.ipynb
-
 
 # Reference
 ## Web Link
