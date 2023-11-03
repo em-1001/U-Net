@@ -13,7 +13,7 @@ $$O = (I-1) \times S + K - 2P$$
 
 
 ## Architecture
-<p align="center"><img src="https://github.com/em-1001/U-Net/assets/80628552/ae0b24aa-c7a2-436f-84ab-2498c21fb994" height="70%" width="70%"></p>
+<p align="center"><img src="https://github.com/em-1001/U-Net/blob/master/Images/Architecture.png" height="70%" width="70%"></p>
 
 #### Contracting path
 전체적인 architecture는 위와 같이 생겼다. Contracting path부터 살펴보면 572x572와 같은 수는 해상도를 의미하며 입력이 흑백이면 채널 size는 위 architecture의 input처럼 1이 된다. 이러한 input에 kernel size가 64인 Convolution Layer를 사용해서 570x570x64 출력 tensor를 얻는다. 이러한 Convolution Layer을 한 번 더 사용해서 568x568로 줄여주었고, 다음으로 max pooling을 이용해서 너비와 높이를 절반 씩으로 줄여주었다. 다음으로 다시 Convolution Layer를 사용하여 channel size는 증가시키고, 너비와 높이는 줄여준다.
@@ -26,7 +26,7 @@ Expanding path에서는 반대로 up-conv를 사용해서 해상도를 증가시
 
 
 ## Overlap-tile
-<p align="center"><img src="https://github.com/em-1001/U-Net/assets/80628552/50229385-c271-4e28-ac01-6ae8487f4df3" height="60%" width="60%"></p>
+<p align="center"><img src="https://github.com/em-1001/U-Net/blob/master/Images/Overlap-tile.png" height="60%" width="60%"></p>
 
 U-Net은 Overlap-tile 전략을 사용하는데, 이는 U-Net 구조의 특성상 출력 이미지의 해상도가 입력 이미지보다 작기 때문에 의도적으로 입력을 더욱 크게 넣는 것이다. 예를 들어 위 사진에서 노란색 영역만큼 Segmentation결과가 필요하다고 하면 그보다 더 큰 파란색 영역을 입력으로 넣는다. 이렇게 하게 되면 파란색 영역 tile과 그 오른쪽 tile이 서로 겹칠 수 밖에 없게 되고, 이미지의 왼쪽 위 부분 같은 경우(위 사진에서는 노란색 부분 왼쪽 위) 입력 이미지에는 존재하지 않는 부분이므로 미러링(mirroring)을 통해 이미지 패치를 만들어주어 네트워크에 입력으로 넣게 된다. 
 
@@ -55,7 +55,7 @@ $d_2$ : $\Omega \to R$ : The distance to the border of the second nearest cell.
 
 $w(x)$는 위와 같이 계산되며 세포(cell)을 명확하게 구분하기 위해 작은 분리 경계(small separation border)를 학습한다. 
 
-<p align="center"><img src="https://github.com/em-1001/U-Net/assets/80628552/28fde188-979e-4f9d-9c53-8693aad3d226" height="75%" width="75%"></p>
+<p align="center"><img src="https://github.com/em-1001/U-Net/blob/master/Images/Objective.png" height="75%" width="75%"></p>
 
 세포(cell)가 **b** 사진에서 보이는 것과 같이 붙어있을 수도 있기 때문에 이를 명확하게 구분하기 위해서 가중치를 사용하는 것이다. $w_c$는 각각의 class마다 나타나는 빈도가 다를 수 있기 때문에 이를 조율하기 위한 가중치이고, $d_1$은 가장 가까운 세포 경계까지의 거리를 의미하며 $d_2$는 두 번째로 가까운 세포 경계까지의 거리를 의미한다. 따라서 가중치 함수의 두 번째 term을 살펴보면 지수함수에 마이너스가 붙어서 거리값이 들어가므로 거리값이 작으면 작을 수록 가중치가 커지고 거리가 크면 가중치가 작아지게 된다. 즉, 인접한 세포(touching cell)사이에 있는 배경 레이블에 대해 높은 가중치를 부여하여 명확하게 분리가 되도록 한다. 
 사진 **c** 를 보면 인접한 세포에 검은색 배경선이 있어 명확하게 배경으로 분류된 것을 확인할 수 있다. 
@@ -64,14 +64,14 @@ $w(x)$는 위와 같이 계산되며 세포(cell)을 명확하게 구분하기 �
 ## Data Augmentation
 본 논문에서는 레이블 정보가 있는(annotated) 즉, Ground truth가 있는 데이터가 적은 상황에서 효율적인 데이터 증진(data augmentation)기법을 제안한다. 의료 영상의 경우 이미지에 label을 넣기 위해서는 높은 수준의 전문의들이 직접 label을 넣어야 하기 때문에 비용이 매우 크므로 이러한 data augmentation 기법은 매우 중요하다. 
 
-<p align="center"><img src="https://github.com/em-1001/U-Net/assets/80628552/a26bf9f6-6452-4c10-b280-27a12bbff833" height="45%" width="45%"></p>
+<p align="center"><img src="https://github.com/em-1001/U-Net/blob/master/Images/Augmentation.png" height="45%" width="45%"></p>
 
 본 논문에서는 일반적인 data augmentation에 더해 추가적으로 위 사진과 같이  Elastic Deformation 기법을 사용하였다. ElasticTransform은 각각 grid에 대해 보다 비선형적으로 변형을 가해 학습 데이터로 사용하는 방식이다. 
 
 또한 image segmentation분야는 입력 데이터와 출력 데이터가 모두 이미지 형태이기 때문에 이러한 data augmentation을 사용할 때 입력 이미지와 출력 이미지가 되는 mask image에 대해서도 같은 transformation을 적용하는 것이 일반적이다. 
 
 ## Experiments 
-<p align="center"><img src="https://github.com/em-1001/U-Net/assets/80628552/d7015dc8-cf08-4b1c-a61a-6d09adeece7a" height="75%" width="75%"></p>
+<p align="center"><img src="https://github.com/em-1001/U-Net/blob/master/Images/Experiments.png" height="75%" width="75%"></p>
 
 **PHC-U373** : 35개의 부분적으로 주석이 있는(annotated) 학습 이미지 데이터 세트  
 **DIC-HeLa** : 20개의 부분적으로 주석이 있는(annotated) 학습 이미지 데이터 세트
