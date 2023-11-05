@@ -33,7 +33,7 @@ U-Net은 Overlap-tile 전략을 사용하는데, 이는 U-Net 구조의 특성�
 ## Objective Function 
 U-Net은 Segmentation을 위한 네트워크이므로 다음과 같이 필셀 단위(pixel-wise) softmax를 사용한다. 
 
-$$P_k(x) = \frac{\exp(a_k(x))}{\displaystyle\sum_{k^{'}=1}^{K} exp(a_{k^{'}}(x))}$$
+$$P_k(x) = \frac{\exp(a_k(x))}{\displaystyle\sum_{k^{'}=1}^{K} \exp(a_{k^{'}}(x))}$$
 
 $x \in \Omega$ : pixel position ($\Omega \subset Z^2$)  
 $k$ : $k$ th feature channel(class)  
